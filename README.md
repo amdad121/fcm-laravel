@@ -41,7 +41,7 @@ See [`config/fcm.php`](config/fcm.php) for every option:
 | --- | --- | --- | --- |
 | `credentials` | `FIREBASE_CREDENTIALS` | — | Path to the service account JSON. Absolute or relative to the app base path. |
 | `http.timeout` | `FCM_HTTP_TIMEOUT` | `10` | HTTP timeout (seconds) for the send request. |
-| `android.priority` | `FCM_ANDROID_PRIORITY` | `high` | Default for every message's `android` payload. Set to `null` to omit. A notification can override it for itself alone — see [Notifications](#notifications). |
+| `android.priority` | `FCM_ANDROID_PRIORITY` | `normal` | Default for every message's `android` payload. Set to `null` to omit. A notification can override it for itself alone — see [Notifications](#notifications). |
 | `android.channel_id` | `FCM_ANDROID_CHANNEL_ID` | `default_channel` | Android notification channel ID. Set to `null` to omit. |
 | `apns.priority` | `FCM_APNS_PRIORITY` | — | Sets `apns.headers.apns-priority` (`5` or `10`). Omitted from the payload unless set. |
 | `debug` | `FCM_DEBUG` | `APP_DEBUG` | Logs skipped sends, rejected tokens, and delivery failures. Independent of the host app's `app.debug`. |

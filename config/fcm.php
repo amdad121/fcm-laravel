@@ -63,7 +63,7 @@ return [
     */
 
     'android' => [
-        'priority' => env('FCM_ANDROID_PRIORITY', 'high'),
+        'priority' => env('FCM_ANDROID_PRIORITY', 'normal'),
         'channel_id' => env('FCM_ANDROID_CHANNEL_ID', 'default_channel'),
     ],
 
