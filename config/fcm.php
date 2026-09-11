@@ -57,7 +57,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Applied to every outgoing message's `android` payload. Set
-    | `channel_id` to null to omit it from the payload.
+    | `channel_id` to null to omit it from the payload. `priority` can be
+    | overridden per notification via `HasFcmPayload::toFcm()`.
     |
     */
 

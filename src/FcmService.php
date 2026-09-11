@@ -41,8 +41,9 @@ class FcmService
 
     /**
      * @param  array<string, string>  $data
+     * @param  'high'|'normal'|null  $androidPriority  Overrides `config('fcm.android.priority')` for this message only.
      */
-    public function sendToToken(string $token, string $title, string $body, array $data = []): bool
+    public function sendToToken(string $token, string $title, string $body, array $data = [], ?string $androidPriority = null): bool
     {
         $credentials = $this->credentials();
 
@@ -58,7 +59,7 @@ class FcmService
             ],
         ];
 
-        $android = $this->androidConfig();
+        $android = $this->androidConfig($androidPriority);
 
         if ($android !== []) {
             $message['android'] = $android;
@@ -112,11 +113,12 @@ class FcmService
     }
 
     /**
+     * @param  'high'|'normal'|null  $priorityOverride
      * @return array<string, mixed>
      */
-    private function androidConfig(): array
+    private function androidConfig(?string $priorityOverride = null): array
     {
-        $priority = config('fcm.android.priority');
+        $priority = $priorityOverride ?? config('fcm.android.priority');
         $channelId = config('fcm.android.channel_id');
 
         if (blank($priority) && blank($channelId)) {

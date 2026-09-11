@@ -7,7 +7,7 @@ namespace AmdadulHaq\Fcm\Contracts;
 interface HasFcmPayload
 {
     /**
-     * @return array{title: string, body: string, data?: array<string, string>}
+     * @return array{title: string, body: string, data?: array<string, string>, priority?: 'high'|'normal'}
      */
     public function toFcm(object $notifiable): array;
 }

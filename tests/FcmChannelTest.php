@@ -6,6 +6,7 @@ use AmdadulHaq\Fcm\Events\FcmTokenRejected;
 use AmdadulHaq\Fcm\Notifications\FcmChannel;
 use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmNotifiable;
 use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmNotification;
+use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmPriorityNotification;
 use AmdadulHaq\Fcm\Tests\Fixtures\PlainNotification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -61,6 +62,19 @@ it('sends the notification payload to every routed token', function (): void {
     app(FcmChannel::class)->send(new FakeFcmNotifiable(['token-a', 'token-b']), new FakeFcmNotification);
 
     Http::assertSentCount(2);
+});
+
+it('forwards the notification payload priority to the fcm service', function (): void {
+    config(['fcm.credentials' => fakeFcmCredentials(), 'fcm.android.priority' => 'normal', 'fcm.android.channel_id' => null]);
+    seedFakeFcmAccessTokenForChannel();
+
+    Http::fake([
+        'fcm.googleapis.com/*' => Http::response(['name' => 'projects/test-project/messages/1']),
+    ]);
+
+    app(FcmChannel::class)->send(new FakeFcmNotifiable(['token-a']), new FakeFcmPriorityNotification);
+
+    Http::assertSent(fn ($request): bool => $request->data()['message']['android'] === ['priority' => 'high']);
 });
 
 it('dispatches FcmTokenRejected and continues when a token is unregistered', function (): void {

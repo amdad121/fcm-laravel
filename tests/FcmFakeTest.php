@@ -7,6 +7,7 @@ use AmdadulHaq\Fcm\FcmService;
 use AmdadulHaq\Fcm\Notifications\FcmChannel;
 use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmNotifiable;
 use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmNotification;
+use AmdadulHaq\Fcm\Tests\Fixtures\FakeFcmPriorityNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -21,6 +22,14 @@ it('records sends instead of hitting the network', function (): void {
     Http::assertNothingSent();
     $fake->assertSentTo('token-a', fn (string $title, string $body): bool => $title === 'Title' && $body === 'Body');
     $fake->assertSentCount(1);
+});
+
+it('records the per-message android priority override for assertions', function (): void {
+    $fake = FcmService::fake();
+
+    app(FcmChannel::class)->send(new FakeFcmNotifiable(['token-a']), new FakeFcmPriorityNotification);
+
+    $fake->assertSentTo('token-a', fn (string $title, string $body, array $data, ?string $priority): bool => $priority === 'high');
 });
 
 it('asserts nothing was sent', function (): void {

@@ -78,6 +78,36 @@ it('sends a message to the fcm v1 endpoint with the configured android options',
     });
 });
 
+it('lets a per-message android priority override the configured default', function (): void {
+    config([
+        'fcm.credentials' => fakeCredentialsPath(),
+        'fcm.android.priority' => 'high',
+        'fcm.android.channel_id' => null,
+    ]);
+    seedFakeFcmAccessToken();
+
+    Http::fake(['fcm.googleapis.com/*' => Http::response(['name' => 'ok'])]);
+
+    app(FcmService::class)->sendToToken('device-token', 'Title', 'Body', [], 'normal');
+
+    Http::assertSent(fn ($request): bool => $request->data()['message']['android'] === ['priority' => 'normal']);
+});
+
+it('falls back to the configured android priority when no override is given', function (): void {
+    config([
+        'fcm.credentials' => fakeCredentialsPath(),
+        'fcm.android.priority' => 'high',
+        'fcm.android.channel_id' => null,
+    ]);
+    seedFakeFcmAccessToken();
+
+    Http::fake(['fcm.googleapis.com/*' => Http::response(['name' => 'ok'])]);
+
+    app(FcmService::class)->sendToToken('device-token', 'Title', 'Body');
+
+    Http::assertSent(fn ($request): bool => $request->data()['message']['android'] === ['priority' => 'high']);
+});
+
 it('omits the android block when priority and channel_id are both unset', function (): void {
     config([
         'fcm.credentials' => fakeCredentialsPath(),

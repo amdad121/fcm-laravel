@@ -57,7 +57,7 @@ class FcmChannel
 
         foreach ($tokens as $token) {
             try {
-                $this->fcm->sendToToken($token, $payload['title'], $payload['body'], $payload['data'] ?? []);
+                $this->fcm->sendToToken($token, $payload['title'], $payload['body'], $payload['data'] ?? [], $payload['priority'] ?? null);
             } catch (FcmUnregisteredTokenException) {
                 Event::dispatch(new FcmTokenRejected($token, $notifiable));
             } catch (Throwable $exception) {

@@ -18,7 +18,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 class FcmFake extends FcmService
 {
     /**
-     * @var array<int, array{token: string, title: string, body: string, data: array<string, string>}>
+     * @var array<int, array{token: string, title: string, body: string, data: array<string, string>, priority: string|null}>
      */
     private array $sent = [];
 
@@ -34,14 +34,15 @@ class FcmFake extends FcmService
 
     /**
      * @param  array<string, string>  $data
+     * @param  'high'|'normal'|null  $androidPriority
      */
-    public function sendToToken(string $token, string $title, string $body, array $data = []): bool
+    public function sendToToken(string $token, string $title, string $body, array $data = [], ?string $androidPriority = null): bool
     {
         if (in_array($token, $this->unregisteredTokens, true)) {
             throw new FcmUnregisteredTokenException($token);
         }
 
-        $this->sent[] = compact('token', 'title', 'body', 'data');
+        $this->sent[] = ['token' => $token, 'title' => $title, 'body' => $body, 'data' => $data, 'priority' => $androidPriority];
 
         return true;
     }
@@ -86,7 +87,7 @@ class FcmFake extends FcmService
      */
     public function assertSentTo(string $token, ?Closure $callback = null): void
     {
-        $this->assertSent(fn (string $sentToken, string $title, string $body, array $data): bool => $sentToken === $token && (! $callback instanceof Closure || $callback($title, $body, $data)));
+        $this->assertSent(fn (string $sentToken, string $title, string $body, array $data, ?string $priority): bool => $sentToken === $token && (! $callback instanceof Closure || $callback($title, $body, $data, $priority)));
     }
 
     /**
@@ -111,14 +112,14 @@ class FcmFake extends FcmService
     }
 
     /**
-     * @return Collection<int, array{token: string, title: string, body: string, data: array<string, string>}>
+     * @return Collection<int, array{token: string, title: string, body: string, data: array<string, string>, priority: string|null}>
      */
     private function matching(?Closure $callback): Collection
     {
         $callback ??= fn (): bool => true;
 
         return collect($this->sent)->filter(
-            fn (array $push): bool => $callback($push['token'], $push['title'], $push['body'], $push['data'])
+            fn (array $push): bool => $callback($push['token'], $push['title'], $push['body'], $push['data'], $push['priority'])
         );
     }
 }
